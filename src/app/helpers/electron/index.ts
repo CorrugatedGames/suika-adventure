@@ -10,6 +10,8 @@ export function setMainDiscordStatus(status: string) {
 }
 
 export function setDiscordStatus(status: IDiscordPresenceOpts) {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).discordRPCStatus = {
     ...status,
     details: discordMainStatus || status.details
