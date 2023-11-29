@@ -1,4 +1,4 @@
-import { GameOption, IOptions } from '../../interfaces';
+import { IOptions } from '../../interfaces';
 
 export const optionsStoreMigrations = [
   {
@@ -8,12 +8,4 @@ export const optionsStoreMigrations = [
       version: 1
     })
   },
-  {
-    version: 1,
-    migrate: (state: IOptions) => ({
-      ...state,
-      [GameOption.ShowNotifications]: true,
-      version: 2
-    })
-  }
 ].map(x => ({ ...x, key: 'options' }));

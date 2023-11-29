@@ -31,11 +31,6 @@ export class OptionsState {
   }
 
   @Selector()
-  static getSidebarDisplay(state: IOptions) {
-    return state[GameOption.SidebarDisplay];
-  }
-
-  @Selector()
   static getColorTheme(state: IOptions) {
     return state[GameOption.ColorTheme];
   }

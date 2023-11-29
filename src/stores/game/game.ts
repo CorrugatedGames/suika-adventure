@@ -4,13 +4,13 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { attachAction } from '@seiyria/ngxs-attach-action';
 import { AnalyticsService } from '../../app/services/analytics.service';
-import { CloudSaveService } from '../../app/services/cloudsave.service';
+import { CloudSaveService } from '../../app/services/cloud-save.service';
 import { NotifyService } from '../../app/services/notify.service';
 import { VisualsService } from '../../app/services/visuals.service';
 import { IGame } from '../../interfaces';
 import {
   AnalyticsTrack, NotifyError, NotifyInfo, NotifySuccess,
-  NotifyTradeskill, NotifyWarning, PlaySFX, UpdateFirebaseSavefile
+  NotifyWarning, PlaySFX, UpdateFirebaseSavefile
 } from './game.actions';
 import { attachments } from './game.attachments';
 import { defaultGame } from './game.functions';
@@ -56,11 +56,6 @@ export class GameState {
   @Action(NotifySuccess)
   notifySuccess(ctx: StateContext<IGame>, { message }: NotifySuccess) {
     this.notify.success(message);
-  }
-
-  @Action(NotifyTradeskill)
-  notifyTradeskill(ctx: StateContext<IGame>, { tradeskill, message }: NotifyTradeskill) {
-    this.notify.tradeskill(tradeskill, message);
   }
 
   @Action(AnalyticsTrack)
