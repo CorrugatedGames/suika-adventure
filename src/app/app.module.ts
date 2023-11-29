@@ -15,9 +15,10 @@ import { AnalyticsService } from './services/analytics.service';
 import { CloudSaveService } from './services/cloud-save.service';
 import { MetaService } from './services/meta.service';
 
+import { isInElectron } from './helpers/electron';
+
 import * as Stores from '../stores';
 import * as Migrations from '../stores/migrations';
-
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const allStores = Object.keys(Stores).filter(x => x.includes('State')).map(x => (Stores as Record<string, any>)[x]);
@@ -32,7 +33,7 @@ const allStores = Object.keys(Stores).filter(x => x.includes('State')).map(x => 
     NgxWebstorageModule.forRoot(),
     NgxTippyModule,
     NgxsModule.forRoot(allStores, {
-      developmentMode: !isDevMode()
+      developmentMode: !isDevMode() && !isInElectron()
     }),
     NgxsLoggerPluginModule.forRoot({
       disabled: !isDevMode(),
