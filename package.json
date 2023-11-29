@@ -8,7 +8,7 @@
     "start:both": "concurrently --kill-others -n angular,electron \"npm start\" \"npm run start:electron\"",
     "build": "ng build --configuration production && npm run build:copypost",
     "build:electron": "npm run build && npm run syncversion && cd electron && npm run make",
-    "build:netlify": "npm run load:content && npm run buildvars && npm run build",
+    "build:netlify": "npm run buildvars && npm run build",
     "build:copypost": "cpy CHANGELOG.md CHANGELOG-current.md dist/browser/assets",
     "buildvars": "ts-node scripts/buildvars",
     "blogpost:generate": "ts-node scripts/blog-version-notes",
