@@ -1,0 +1,32 @@
+
+.header-container {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.description-container {
+  margin-top: 24px;
+  text-align: center;
+  font-style: italic;
+}
+
+.score-container {
+  margin-top: 24px;
+  text-align: center;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.game-row {
+  padding-top: 48px;
+
+  .rotary-container {
+
+  }
+
+  .game-container {
+    app-suika-game {
+      border: 1px solid #000;
+    }
+  }
+}

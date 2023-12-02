@@ -17,59 +17,61 @@ import { MetaService } from './services/meta.service';
 
 import { isInElectron } from './helpers/electron';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import * as Stores from '../stores';
 import * as Migrations from '../stores/migrations';
+import { SuikaModule } from './pages/suika/suika.module';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const allStores = Object.keys(Stores).filter(x => x.includes('State')).map(x => (Stores as Record<string, any>)[x]);
+const allStores = Object.keys(Stores)
+  .filter((x) => x.includes('State'))
+  .map((x) => (Stores as Record<string, any>)[x]);
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgxWebstorageModule.forRoot(),
     NgxTippyModule,
     NgxsModule.forRoot(allStores, {
-      developmentMode: !isDevMode() && !isInElectron()
+      developmentMode: !isDevMode() && !isInElectron(),
     }),
     NgxsLoggerPluginModule.forRoot({
       disabled: !isDevMode(),
-      filter: action => !action.constructor.name.includes('Timer')
+      filter: (action) => !action.constructor.name.includes('Timer'),
     }),
     NgxsStoragePluginModule.forRoot({
       key: allStores,
       migrations: Object.values(Migrations).flat(),
-      storage: StorageOption.LocalStorage
+      storage: StorageOption.LocalStorage,
     }),
     NgxsReduxDevtoolsPluginModule.forRoot(),
+    SuikaModule,
+    NgbModule,
   ],
   providers: [
     provideServiceWorker('ngsw-worker.js', {
-        enabled: !isDevMode(),
-        registrationStrategy: 'registerWhenStable:30000'
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
     }),
     {
       provide: APP_INITIALIZER,
       multi: true,
-      deps: [
-        CloudSaveService,
-        MetaService,
-        AnalyticsService,
-      ],
-      useFactory: (
-        cloudSaveService: CloudSaveService,
-        metaService: MetaService,
-        analyticsService: AnalyticsService,
-      ) => async () => {
-        await cloudSaveService.init();
-        await metaService.init();
-        await analyticsService.init();
-      }
-    }
+      deps: [CloudSaveService, MetaService, AnalyticsService],
+      useFactory:
+        (
+          cloudSaveService: CloudSaveService,
+          metaService: MetaService,
+          analyticsService: AnalyticsService,
+        ) =>
+        async () => {
+          await cloudSaveService.init();
+          await metaService.init();
+          await analyticsService.init();
+        },
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

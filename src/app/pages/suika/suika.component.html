@@ -1,0 +1,48 @@
+<div class="container">
+
+  <div class="row header-row">
+    <div class="col-12 header-container">
+      <h1>Suika Adventure</h1>
+    </div>
+
+    <div class="col-12 description-container">
+      <p>The adventure is coming...</p>
+    </div>
+
+    <div class="row score-row">
+      <div class="col-12 score-container">
+        <p>Score: {{ score$ | async | number }}</p>
+        <p>Best Score: {{ bestScore$ | async | number }}</p>
+      </div>
+    </div>
+
+    <div class="row game-row">
+      <div class="col-3 rotary-container">
+        rotary: add this lol
+      </div>
+
+      <div class="col-9 game-container">
+        <app-suika-game></app-suika-game>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<button (click)="gameOver()">game over dude</button>
+
+<ng-template #gameOverModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Game Over!</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    you lost. restart?
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Restart Game</button>
+  </div>
+</ng-template>
