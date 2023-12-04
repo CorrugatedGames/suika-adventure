@@ -1,5 +1,3 @@
-
-
 import { Injectable } from '@angular/core';
 import { Selector, State } from '@ngxs/store';
 import { attachAction } from '@seiyria/ngxs-attach-action';
@@ -9,13 +7,11 @@ import { defaultSuika } from './suika.functions';
 
 @State<ISuika>({
   name: 'suika',
-  defaults: defaultSuika()
+  defaults: defaultSuika(),
 })
 @Injectable()
 export class SuikaState {
-
-  constructor(
-  ) {
+  constructor() {
     attachments.forEach(({ action, handler }) => {
       attachAction(SuikaState, action, handler);
     });
@@ -32,8 +28,17 @@ export class SuikaState {
   }
 
   @Selector()
+  static currentFruit(state: ISuika) {
+    return state.currentFruit;
+  }
+
+  @Selector()
+  static nextFruit(state: ISuika) {
+    return state.nextFruit;
+  }
+
+  @Selector()
   static state(state: ISuika) {
     return state.gameState;
   }
-
 }

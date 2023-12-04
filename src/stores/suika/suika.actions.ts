@@ -1,4 +1,4 @@
-import { SuikaGameState } from '../../interfaces';
+import { SuikaFruit, SuikaGameState } from '../../interfaces';
 
 export class UpdateScore {
   static type = '[Score] Update Current';
@@ -13,4 +13,14 @@ export class UpdateBestScore {
 export class UpdateGameState {
   static type = '[GameState] Update';
   constructor(public newGameState: SuikaGameState) {}
+}
+
+export class UpdateCurrentFruit {
+  static type = '[GameState] Update Current Fruit';
+  constructor(public newFruit: SuikaFruit) {}
+}
+
+export class UpdateNextFruit {
+  static type = '[GameState] Update Next Fruit';
+  constructor(public newFruit: SuikaFruit) {}
 }

@@ -1,10 +1,23 @@
 import { IAttachment } from '../../interfaces/store';
-import { UpdateBestScore, UpdateGameState, UpdateScore } from './suika.actions';
-import { updateBestScore, updateGameState, updateScore } from './suika.functions';
-
+import {
+  UpdateBestScore,
+  UpdateCurrentFruit,
+  UpdateGameState,
+  UpdateNextFruit,
+  UpdateScore,
+} from './suika.actions';
+import {
+  updateBestScore,
+  updateCurrentFruit,
+  updateGameState,
+  updateNextFruit,
+  updateScore,
+} from './suika.functions';
 
 export const attachments: IAttachment[] = [
   { action: UpdateScore, handler: updateScore },
   { action: UpdateBestScore, handler: updateBestScore },
-  { action: UpdateGameState, handler: updateGameState }
+  { action: UpdateGameState, handler: updateGameState },
+  { action: UpdateCurrentFruit, handler: updateCurrentFruit },
+  { action: UpdateNextFruit, handler: updateNextFruit },
 ];
