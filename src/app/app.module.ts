@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { APP_INITIALIZER, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -22,7 +24,6 @@ import * as Stores from '../stores';
 import * as Migrations from '../stores/migrations';
 import { SuikaModule } from './pages/suika/suika.module';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const allStores = Object.keys(Stores)
   .filter((x) => x.includes('State'))
   .map((x) => (Stores as Record<string, any>)[x]);
