@@ -22,12 +22,22 @@ import {
 import { SuikaState } from '../../../../stores';
 import {
   UpdateCurrentFruit,
+  UpdateGameLoseTimer,
   UpdateGameState,
   UpdateNextFruit,
+  UpdateScore,
 } from '../../../../stores/suika/suika.actions';
 import { settings } from './settings';
 
 import seedrandom from 'seedrandom';
+
+/*
+TODO:
+- game over is fucked (when random returns watermelons and they pop)
+- random multiple game overs
+- make suika fruit display component
+- display next fruit
+*/
 
 @Component({
   selector: 'app-suika-game',
@@ -43,6 +53,7 @@ export class SuikaGameComponent implements OnInit {
   @Select(SuikaState.nextFruit) nextFruit$!: Observable<SuikaFruit>;
 
   private isInit = false;
+  private allTimeouts: Array<ReturnType<typeof setTimeout>> = [];
 
   private lastMousePosition = 0;
 
@@ -64,6 +75,19 @@ export class SuikaGameComponent implements OnInit {
   ngOnInit() {
     combineLatest([this.state$, this.currentFruit$, this.nextFruit$]).subscribe(
       ([state, currentFruit, nextFruit]) => {
+        if (state === SuikaGameState.Restart) {
+          this.isInit = false;
+          this.previewBody = null;
+
+          World.clear(this.world, false);
+          Engine.clear(this.engine);
+          Render.stop(this.render);
+          Runner.stop(this.runner);
+
+          this.store.dispatch(new UpdateGameState(SuikaGameState.Ready));
+          return;
+        }
+
         this.currentState = state;
         this.currentFruit = currentFruit ?? SuikaFruit.Cherry;
         this.nextFruit = nextFruit ?? SuikaFruit.Cherry;
@@ -83,6 +107,7 @@ export class SuikaGameComponent implements OnInit {
     this.engine = Engine.create();
     this.world = this.engine.world;
 
+    // renderer
     this.render = Render.create({
       canvas: this.canvasRef.nativeElement,
       engine: this.engine,
@@ -98,8 +123,8 @@ export class SuikaGameComponent implements OnInit {
     this.runner = Runner.create();
     Runner.run(this.runner, this.engine);
 
+    // walls
     Composite.add(this.world, [
-      // walls
       Bodies.rectangle(
         0,
         settings.size.height / 2 + settings.size.topBuffer,
@@ -128,6 +153,15 @@ export class SuikaGameComponent implements OnInit {
         },
       ),
     ]);
+
+    // collision events
+    Events.on(this.engine, 'collisionStart', (e) => {
+      for (let i = 0; i < e.pairs.length; i++) {
+        const { bodyA, bodyB } = e.pairs[i];
+
+        this.bodyCollision(bodyA as ISuikaFruitBody, bodyB as ISuikaFruitBody);
+      }
+    });
 
     // add mouse control
     const mouse = Mouse.create(this.render.canvas);
@@ -163,9 +197,11 @@ export class SuikaGameComponent implements OnInit {
       max: { x: settings.size.width, y: settings.size.height },
     });
 
+    // generate the first two fruits
     this.cycleFruits();
   }
 
+  // update the preview fruit position
   private updateFruitPosition() {
     if (!this.previewBody) return;
 
@@ -175,6 +211,7 @@ export class SuikaGameComponent implements OnInit {
     });
   }
 
+  // ensure the current fruit display is in bounds
   private ensureFruitIsInBounds(positionX: number) {
     const { min, max } = this.boundsForFruit(this.currentFruit);
     const clampedX = Math.max(min, Math.min(max, positionX));
@@ -183,6 +220,7 @@ export class SuikaGameComponent implements OnInit {
     this.updateFruitPosition();
   }
 
+  // get the current fruit boundaries
   private boundsForFruit(fruit: SuikaFruit) {
     const wallSize = settings.size.wallWidth / 2;
     const fruitData = settings.fruits[fruit];
@@ -194,6 +232,7 @@ export class SuikaGameComponent implements OnInit {
     };
   }
 
+  // switch to the next fruit and generate a new one
   private cycleFruits() {
     const newFruit = this.getRandomDroppableFruit();
 
@@ -206,6 +245,7 @@ export class SuikaGameComponent implements OnInit {
     this.createNewPreviewBody();
   }
 
+  // place the current fruit in the scene
   private addCurrentFruit(dropX: number) {
     if (!this.previewBody) return;
 
@@ -220,8 +260,6 @@ export class SuikaGameComponent implements OnInit {
       this.currentFruit,
     );
 
-    (droppedFruit as ISuikaFruitBody).fruitId = this.currentFruit;
-
     Composite.add(this.world, droppedFruit);
 
     setTimeout(() => {
@@ -229,6 +267,7 @@ export class SuikaGameComponent implements OnInit {
     }, 200);
   }
 
+  // get a random droppable fruit based on settings
   private getRandomDroppableFruit(): SuikaFruit {
     const droppableFruits = Object.keys(settings.fruits)
       .map((fruitId) => {
@@ -241,6 +280,7 @@ export class SuikaGameComponent implements OnInit {
     return +droppableFruits[Math.floor(this.prng() * droppableFruits.length)];
   }
 
+  // create a new preview fruit
   private createNewPreviewBody() {
     if (this.previewBody) return;
 
@@ -259,19 +299,83 @@ export class SuikaGameComponent implements OnInit {
     Composite.add(this.world, this.previewBody);
   }
 
+  // get fruit data from settings
   private getFruitData(fruit: SuikaFruit) {
     return settings.fruits[fruit];
   }
 
+  // get a fruit body
   private generateFruitBody(
     x: number,
     y: number,
     suikaFruit: SuikaFruit,
     extraOpts = {},
   ) {
-    return Bodies.circle(x, y, this.getFruitData(suikaFruit).size, {
+    const body = Bodies.circle(x, y, this.getFruitData(suikaFruit).size, {
       ...settings.friction,
       ...extraOpts,
     });
+
+    (body as ISuikaFruitBody).fruitId = suikaFruit;
+
+    return body;
+  }
+
+  // two bodies collide, but it's just two fruits usually
+  private bodyCollision(bodyA: ISuikaFruitBody, bodyB: ISuikaFruitBody) {
+    if (bodyA.isStatic || bodyB.isStatic) return;
+
+    const aY = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
+    const bY = bodyB.position.y - this.getFruitData(bodyB.fruitId).size;
+
+    if (aY < settings.size.topBuffer || bY < settings.size.topBuffer) {
+      let iter = 0;
+      const timeouts: Array<ReturnType<typeof setTimeout>> = [];
+
+      for (let i = 5; i >= 0; i--) {
+        const timeout = setTimeout(() => {
+          if (this.currentState === SuikaGameState.GameOver) return;
+
+          this.store.dispatch(new UpdateGameLoseTimer(i));
+
+          const aY2 = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
+          const bY2 = bodyB.position.y - this.getFruitData(bodyA.fruitId).size;
+
+          if (aY2 < settings.size.topBuffer || bY2 < settings.size.topBuffer) {
+            if (i === 0) {
+              this.store.dispatch(new UpdateGameState(SuikaGameState.GameOver));
+            }
+          } else {
+            this.store.dispatch(new UpdateGameLoseTimer(0));
+
+            timeouts.forEach((timeout) => clearTimeout(timeout));
+            this.allTimeouts.forEach((timeout) => clearTimeout(timeout));
+          }
+        }, ++iter * 1000);
+
+        timeouts.push(timeout);
+        this.allTimeouts.push(timeout);
+      }
+    }
+
+    if (bodyA.fruitId === bodyB.fruitId) {
+      const newFruitId = bodyA.fruitId + 1;
+
+      const existingFruitData = this.getFruitData(bodyA.fruitId);
+      this.store.dispatch(new UpdateScore(existingFruitData.score));
+
+      const fruitData = this.getFruitData(newFruitId);
+      if (fruitData) {
+        const midPosX = (bodyA.position.x + bodyB.position.x) / 2;
+        const midPosY = (bodyA.position.y + bodyB.position.y) / 2;
+
+        Composite.add(
+          this.world,
+          this.generateFruitBody(midPosX, midPosY, newFruitId),
+        );
+      }
+
+      Composite.remove(this.world, [bodyA, bodyB]);
+    }
   }
 }

@@ -17,8 +17,22 @@
     </div>
 
     <div class="row game-row">
-      <div class="col-3 rotary-container">
-        rotary: add this lol
+      <div class="col-3">
+        <div class="row timer-row">
+          @if(gameLoseTimer$ | async) {
+          <span>
+            Failure in {{ gameLoseTimer$ | async | number }} seconds...
+          </span>
+          }
+        </div>
+
+        <div class="row next-fruit-row">
+          next fruit: add this lol
+        </div>
+
+        <div class="row rotary-row">
+          rotary: add this lol
+        </div>
       </div>
 
       <div class="col-9 game-container">

@@ -22,11 +22,14 @@ import { UpdateGameState } from '../../../stores/suika/suika.actions';
 export class SuikaComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
+  private isGameOverOpen = false;
+
   @ViewChild('gameOverModal') gameOverModalRef!: NgbModal;
 
   @Select(SuikaState.state) state$!: Observable<SuikaGameState>;
   @Select(SuikaState.bestScore) bestScore$!: Observable<number>;
   @Select(SuikaState.score) score$!: Observable<number>;
+  @Select(SuikaState.gameLoseTimer) gameLoseTimer$!: Observable<number>;
 
   constructor(
     private store: Store,
@@ -42,11 +45,16 @@ export class SuikaComponent implements OnInit {
   }
 
   async gameOverModal() {
+    if (this.isGameOverOpen) return;
+    this.isGameOverOpen = true;
+
     try {
       await this.modalService.open(this.gameOverModalRef).result;
     } catch {
       // Do nothing
     }
+
+    this.isGameOverOpen = false;
 
     this.restartGame();
   }
@@ -56,6 +64,6 @@ export class SuikaComponent implements OnInit {
   }
 
   restartGame() {
-    this.store.dispatch(new UpdateGameState(SuikaGameState.Ready));
+    this.store.dispatch(new UpdateGameState(SuikaGameState.Restart));
   }
 }

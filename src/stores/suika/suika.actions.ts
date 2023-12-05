@@ -24,3 +24,8 @@ export class UpdateNextFruit {
   static type = '[GameState] Update Next Fruit';
   constructor(public newFruit: SuikaFruit) {}
 }
+
+export class UpdateGameLoseTimer {
+  static type = '[GameState] Update Lose Timer';
+  constructor(public newTimer: number) {}
+}

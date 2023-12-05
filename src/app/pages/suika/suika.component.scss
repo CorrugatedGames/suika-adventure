@@ -19,11 +19,7 @@
 .game-row {
   padding-top: 48px;
 
-  .rotary-container {
-  }
-
-  .game-container {
-    app-suika-game {
-    }
+  .timer-row {
+    min-height: 24px;
   }
 }

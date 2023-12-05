@@ -1,6 +1,8 @@
 export interface ISuika {
   gameState: SuikaGameState;
 
+  gameLoseTimer: number;
+
   score: number;
   bestScore: number;
 
@@ -26,6 +28,7 @@ export enum SuikaGameState {
   Ready = 'ready',
   Dropping = 'dropping',
   GameOver = 'gameOver',
+  Restart = 'restart',
 }
 
 export interface ISuikaFruitBody extends Matter.Body {

@@ -38,6 +38,11 @@ export class SuikaState {
   }
 
   @Selector()
+  static gameLoseTimer(state: ISuika) {
+    return state.gameLoseTimer;
+  }
+
+  @Selector()
   static state(state: ISuika) {
     return state.gameState;
   }

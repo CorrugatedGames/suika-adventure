@@ -2,6 +2,7 @@ import { IAttachment } from '../../interfaces/store';
 import {
   UpdateBestScore,
   UpdateCurrentFruit,
+  UpdateGameLoseTimer,
   UpdateGameState,
   UpdateNextFruit,
   UpdateScore,
@@ -9,6 +10,7 @@ import {
 import {
   updateBestScore,
   updateCurrentFruit,
+  updateGameLoseTimer,
   updateGameState,
   updateNextFruit,
   updateScore,
@@ -20,4 +22,5 @@ export const attachments: IAttachment[] = [
   { action: UpdateGameState, handler: updateGameState },
   { action: UpdateCurrentFruit, handler: updateCurrentFruit },
   { action: UpdateNextFruit, handler: updateNextFruit },
+  { action: UpdateGameLoseTimer, handler: updateGameLoseTimer },
 ];
