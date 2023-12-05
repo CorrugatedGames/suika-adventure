@@ -31,10 +31,13 @@ import { settings } from './settings';
 
 import seedrandom from 'seedrandom';
 
+import fruitPhysics from '../../../../assets/fruit/physics/fruit.json';
+
 /*
 TODO:
 - make suika fruit display component
 - display next fruit
+- refactor suika game to a bunch of anon functions, etc
 */
 
 @Component({
@@ -302,6 +305,13 @@ export class SuikaGameComponent implements OnInit {
     return settings.fruits[fruit];
   }
 
+  private getFruitPhysics(fruit: SuikaFruit) {
+    const data = this.getFruitData(fruit);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (fruitPhysics as any)[data.fruitId];
+  }
+
   // get a fruit body
   private generateFruitBody(
     x: number,
@@ -309,10 +319,27 @@ export class SuikaGameComponent implements OnInit {
     suikaFruit: SuikaFruit,
     extraOpts = {},
   ) {
-    const body = Bodies.circle(x, y, this.getFruitData(suikaFruit).size, {
-      ...settings.friction,
-      ...extraOpts,
-    });
+    const fruitData = this.getFruitData(suikaFruit);
+    const fruitPhysicsData = this.getFruitPhysics(suikaFruit);
+    const vertices = fruitPhysicsData.fixtures[0].vertices.flat();
+
+    const body = Bodies.fromVertices(
+      x,
+      y,
+      [vertices],
+      {
+        ...settings.friction,
+        ...extraOpts,
+        render: {
+          sprite: {
+            texture: `assets/fruit/images/${fruitData.fruitId}.png`,
+            xScale: 1,
+            yScale: 1,
+          },
+        },
+      },
+      true,
+    );
 
     (body as ISuikaFruitBody).fruitId = suikaFruit;
 
@@ -321,11 +348,13 @@ export class SuikaGameComponent implements OnInit {
 
   // two bodies collide, but it's just two fruits usually
   private bodyCollision(bodyA: ISuikaFruitBody, bodyB: ISuikaFruitBody) {
-    if (bodyA.isStatic || bodyB.isStatic) return;
+    if (bodyA.isStatic || bodyB.isStatic || !bodyA.fruitId || !bodyB.fruitId)
+      return;
 
     const aY = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
     const bY = bodyB.position.y - this.getFruitData(bodyB.fruitId).size;
 
+    // check if we lose
     if (aY < settings.size.topBuffer || bY < settings.size.topBuffer) {
       let iter = 0;
       const timeouts: Array<ReturnType<typeof setTimeout>> = [];
@@ -365,6 +394,7 @@ export class SuikaGameComponent implements OnInit {
       }
     }
 
+    // merge fruits if possible
     if (
       bodyA.fruitId === bodyB.fruitId &&
       !bodyA.hasMerged &&

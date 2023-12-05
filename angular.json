@@ -44,7 +44,10 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/style/index.scss"],
-            "scripts": []
+            "scripts": [
+              "node_modules/pathseg/pathseg.js",
+              "node_modules/poly-decomp/build/decomp.js"
+            ]
           },
           "configurations": {
             "production": {

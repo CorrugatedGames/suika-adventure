@@ -58,6 +58,8 @@
     "ngx-tippy-wrapper": "^6.2.2",
     "ngx-webstorage": "^13.0.1",
     "notiflix": "^3.2.6",
+    "pathseg": "^1.2.1",
+    "poly-decomp": "^0.3.0",
     "recursive-readdir": "^2.2.3",
     "rollbar": "^2.26.2",
     "rss-parser": "^3.13.0",
