@@ -33,8 +33,6 @@ import seedrandom from 'seedrandom';
 
 /*
 TODO:
-- game over is fucked (when random returns watermelons and they pop)
-- random multiple game overs
 - make suika fruit display component
 - display next fruit
 */
@@ -334,14 +332,23 @@ export class SuikaGameComponent implements OnInit {
 
       for (let i = 5; i >= 0; i--) {
         const timeout = setTimeout(() => {
-          if (this.currentState === SuikaGameState.GameOver) return;
+          if (
+            this.currentState === SuikaGameState.GameOver ||
+            this.currentState === SuikaGameState.Restart
+          )
+            return;
 
           this.store.dispatch(new UpdateGameLoseTimer(i));
 
           const aY2 = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
-          const bY2 = bodyB.position.y - this.getFruitData(bodyA.fruitId).size;
+          const bY2 = bodyB.position.y - this.getFruitData(bodyB.fruitId).size;
 
-          if (aY2 < settings.size.topBuffer || bY2 < settings.size.topBuffer) {
+          if (
+            aY2 < settings.size.topBuffer ||
+            (bY2 < settings.size.topBuffer &&
+              Composite.allBodies(this.world).includes(bodyA) &&
+              Composite.allBodies(this.world).includes(bodyB))
+          ) {
             if (i === 0) {
               this.store.dispatch(new UpdateGameState(SuikaGameState.GameOver));
             }
