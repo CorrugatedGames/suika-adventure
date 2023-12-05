@@ -33,6 +33,7 @@ import seedrandom from 'seedrandom';
 
 /*
 TODO:
+- flag a body as merged so it can't multi merge
 - game over is fucked (when random returns watermelons and they pop)
 - random multiple game overs
 - make suika fruit display component
@@ -358,7 +359,14 @@ export class SuikaGameComponent implements OnInit {
       }
     }
 
-    if (bodyA.fruitId === bodyB.fruitId) {
+    if (
+      bodyA.fruitId === bodyB.fruitId &&
+      !bodyA.hasMerged &&
+      !bodyB.hasMerged
+    ) {
+      bodyA.hasMerged = true;
+      bodyB.hasMerged = true;
+
       const newFruitId = bodyA.fruitId + 1;
 
       const existingFruitData = this.getFruitData(bodyA.fruitId);

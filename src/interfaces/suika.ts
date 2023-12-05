@@ -33,4 +33,5 @@ export enum SuikaGameState {
 
 export interface ISuikaFruitBody extends Matter.Body {
   fruitId: SuikaFruit;
+  hasMerged: boolean;
 }
