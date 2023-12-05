@@ -35,7 +35,7 @@ import fruitPhysics from '../../../../assets/fruit/physics/fruit.json';
 
 /*
 TODO:
-- add outer walls outside of visuals so things can't fall out
+- adjust all hitboxes
 - make suika fruit display component
 - display next fruit
 - refactor suika game to a bunch of anon functions, etc
@@ -127,6 +127,7 @@ export class SuikaGameComponent implements OnInit {
 
     // walls
     Composite.add(this.world, [
+      // left side
       Bodies.rectangle(
         0,
         settings.size.height / 2 + settings.size.topBuffer,
@@ -137,6 +138,17 @@ export class SuikaGameComponent implements OnInit {
         },
       ),
       Bodies.rectangle(
+        -settings.size.wallWidth,
+        settings.size.height / 2,
+        settings.size.wallWidth,
+        settings.size.height,
+        {
+          isStatic: true,
+        },
+      ),
+
+      // right side
+      Bodies.rectangle(
         settings.size.width,
         settings.size.height / 2 + settings.size.topBuffer,
         settings.size.wallWidth,
@@ -146,12 +158,38 @@ export class SuikaGameComponent implements OnInit {
         },
       ),
       Bodies.rectangle(
+        settings.size.width + settings.size.wallWidth,
+        settings.size.height / 2,
+        settings.size.wallWidth,
+        settings.size.height,
+        {
+          isStatic: true,
+        },
+      ),
+
+      // bottom
+      Bodies.rectangle(
         settings.size.width / 2,
         settings.size.height,
         settings.size.width,
         settings.size.wallWidth,
         {
           isStatic: true,
+        },
+      ),
+
+      // top bar
+      Bodies.rectangle(
+        settings.size.width / 2,
+        settings.size.topBuffer,
+        settings.size.width,
+        1,
+        {
+          isSensor: false,
+          isStatic: true,
+          collisionFilter: {
+            mask: 0,
+          },
         },
       ),
     ]);
