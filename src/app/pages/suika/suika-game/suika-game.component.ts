@@ -33,7 +33,6 @@ import seedrandom from 'seedrandom';
 
 /*
 TODO:
-- flag a body as merged so it can't multi merge
 - game over is fucked (when random returns watermelons and they pop)
 - random multiple game overs
 - make suika fruit display component
