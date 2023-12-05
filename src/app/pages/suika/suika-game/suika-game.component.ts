@@ -35,7 +35,6 @@ import fruitPhysics from '../../../../assets/fruit/physics/fruit.json';
 
 /*
 TODO:
-- boozle bug
 - add outer walls outside of visuals so things can't fall out
 - make suika fruit display component
 - display next fruit
