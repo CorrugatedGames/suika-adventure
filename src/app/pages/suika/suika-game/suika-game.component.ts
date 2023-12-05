@@ -35,6 +35,8 @@ import fruitPhysics from '../../../../assets/fruit/physics/fruit.json';
 
 /*
 TODO:
+- boozle bug
+- add outer walls outside of visuals so things can't fall out
 - make suika fruit display component
 - display next fruit
 - refactor suika game to a bunch of anon functions, etc
@@ -319,6 +321,10 @@ export class SuikaGameComponent implements OnInit {
     suikaFruit: SuikaFruit,
     extraOpts = {},
   ) {
+    if (!suikaFruit) {
+      throw new Error(`Cannot generate invalid suika fruit ${suikaFruit}`);
+    }
+
     const fruitData = this.getFruitData(suikaFruit);
     const fruitPhysicsData = this.getFruitPhysics(suikaFruit);
     const vertices = fruitPhysicsData.fixtures[0].vertices.flat();
