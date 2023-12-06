@@ -40,6 +40,7 @@ TODO:
 - adjust all hitboxes
 - random direction for merged fruit
 - refactor suika game to a bunch of anon functions, etc
+- create game by uuid, store uuid in suika state
 */
 
 @Component({
