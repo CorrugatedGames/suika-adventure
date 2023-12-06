@@ -1,3 +1,9 @@
-
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+
+body {
+  background: url(../../assets/core/splash-dark.png) no-repeat center
+    center/cover;
+
+  color: #fff;
+}

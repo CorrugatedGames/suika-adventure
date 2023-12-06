@@ -27,17 +27,18 @@ import {
   UpdateNextFruit,
   UpdateScore,
 } from '../../../../stores/suika/suika.actions';
-import { settings } from './settings';
+import { settings } from '../../../settings';
 
 import seedrandom from 'seedrandom';
-
-import fruitPhysics from '../../../../assets/fruit/physics/fruit.json';
+import {
+  getFruitData,
+  getFruitPhysics,
+} from '../../../helpers/suika/fruit-data';
 
 /*
 TODO:
 - adjust all hitboxes
-- make suika fruit display component
-- display next fruit
+- random direction for merged fruit
 - refactor suika game to a bunch of anon functions, etc
 */
 
@@ -75,6 +76,16 @@ export class SuikaGameComponent implements OnInit {
   constructor(private store: Store) {}
 
   ngOnInit() {
+    document.body.addEventListener(
+      'contextmenu',
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      },
+      false,
+    );
+
     combineLatest([this.state$, this.currentFruit$, this.nextFruit$]).subscribe(
       ([state, currentFruit, nextFruit]) => {
         if (state === SuikaGameState.Restart) {
@@ -135,6 +146,9 @@ export class SuikaGameComponent implements OnInit {
         settings.size.height,
         {
           isStatic: true,
+          render: {
+            ...settings.visual.wall,
+          },
         },
       ),
       Bodies.rectangle(
@@ -144,6 +158,9 @@ export class SuikaGameComponent implements OnInit {
         settings.size.height,
         {
           isStatic: true,
+          render: {
+            ...settings.visual.wall,
+          },
         },
       ),
 
@@ -155,6 +172,9 @@ export class SuikaGameComponent implements OnInit {
         settings.size.height,
         {
           isStatic: true,
+          render: {
+            ...settings.visual.wall,
+          },
         },
       ),
       Bodies.rectangle(
@@ -164,6 +184,9 @@ export class SuikaGameComponent implements OnInit {
         settings.size.height,
         {
           isStatic: true,
+          render: {
+            ...settings.visual.wall,
+          },
         },
       ),
 
@@ -175,6 +198,9 @@ export class SuikaGameComponent implements OnInit {
         settings.size.wallWidth,
         {
           isStatic: true,
+          render: {
+            ...settings.visual.wall,
+          },
         },
       ),
 
@@ -198,7 +224,6 @@ export class SuikaGameComponent implements OnInit {
     Events.on(this.engine, 'collisionStart', (e) => {
       for (let i = 0; i < e.pairs.length; i++) {
         const { bodyA, bodyB } = e.pairs[i];
-
         this.bodyCollision(bodyA as ISuikaFruitBody, bodyB as ISuikaFruitBody);
       }
     });
@@ -339,18 +364,6 @@ export class SuikaGameComponent implements OnInit {
     Composite.add(this.world, this.previewBody);
   }
 
-  // get fruit data from settings
-  private getFruitData(fruit: SuikaFruit) {
-    return settings.fruits[fruit];
-  }
-
-  private getFruitPhysics(fruit: SuikaFruit) {
-    const data = this.getFruitData(fruit);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (fruitPhysics as any)[data.fruitId];
-  }
-
   // get a fruit body
   private generateFruitBody(
     x: number,
@@ -362,8 +375,13 @@ export class SuikaGameComponent implements OnInit {
       throw new Error(`Cannot generate invalid suika fruit ${suikaFruit}`);
     }
 
-    const fruitData = this.getFruitData(suikaFruit);
-    const fruitPhysicsData = this.getFruitPhysics(suikaFruit);
+    const fruitData = getFruitData(suikaFruit);
+    const fruitPhysicsData = getFruitPhysics(suikaFruit);
+
+    if (!fruitData || !fruitPhysicsData) {
+      throw new Error(`Cannot get data or physics for ${suikaFruit}`);
+    }
+
     const vertices = fruitPhysicsData.fixtures[0].vertices.flat();
 
     const body = Bodies.fromVertices(
@@ -384,6 +402,10 @@ export class SuikaGameComponent implements OnInit {
       true,
     );
 
+    if (!body) {
+      throw new Error(`Cannot generate body for suika fruit ${suikaFruit}`);
+    }
+
     (body as ISuikaFruitBody).fruitId = suikaFruit;
 
     return body;
@@ -394,8 +416,8 @@ export class SuikaGameComponent implements OnInit {
     if (bodyA.isStatic || bodyB.isStatic || !bodyA.fruitId || !bodyB.fruitId)
       return;
 
-    const aY = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
-    const bY = bodyB.position.y - this.getFruitData(bodyB.fruitId).size;
+    const aY = bodyA.position.y - getFruitData(bodyA.fruitId).size;
+    const bY = bodyB.position.y - getFruitData(bodyB.fruitId).size;
 
     // check if we lose
     if (aY < settings.size.topBuffer || bY < settings.size.topBuffer) {
@@ -412,8 +434,8 @@ export class SuikaGameComponent implements OnInit {
 
           this.store.dispatch(new UpdateGameLoseTimer(i));
 
-          const aY2 = bodyA.position.y - this.getFruitData(bodyA.fruitId).size;
-          const bY2 = bodyB.position.y - this.getFruitData(bodyB.fruitId).size;
+          const aY2 = bodyA.position.y - getFruitData(bodyA.fruitId).size;
+          const bY2 = bodyB.position.y - getFruitData(bodyB.fruitId).size;
 
           if (
             aY2 < settings.size.topBuffer ||
@@ -448,10 +470,10 @@ export class SuikaGameComponent implements OnInit {
 
       const newFruitId = bodyA.fruitId + 1;
 
-      const existingFruitData = this.getFruitData(bodyA.fruitId);
+      const existingFruitData = getFruitData(bodyA.fruitId);
       this.store.dispatch(new UpdateScore(existingFruitData.score));
 
-      const fruitData = this.getFruitData(newFruitId);
+      const fruitData = getFruitData(newFruitId);
       if (fruitData) {
         const midPosX = (bodyA.position.x + bodyB.position.x) / 2;
         const midPosY = (bodyA.position.y + bodyB.position.y) / 2;

@@ -9,13 +9,6 @@
       <p>The adventure is coming...</p>
     </div>
 
-    <div class="row score-row">
-      <div class="col-12 score-container">
-        <p>Score: {{ score$ | async | number }}</p>
-        <p>Best Score: {{ bestScore$ | async | number }}</p>
-      </div>
-    </div>
-
     <div class="row game-row">
       <div class="col-3">
         <div class="row timer-row">
@@ -26,12 +19,19 @@
           }
         </div>
 
+        <div class="row score-row">
+          <div class="col-12 score-container">
+            <p>Score: {{ score$ | async | number }}</p>
+            <p>Best Score: {{ bestScore$ | async | number }}</p>
+          </div>
+        </div>
+
         <div class="row next-fruit-row">
-          next fruit: add this lol
+          <app-next-fruit></app-next-fruit>
         </div>
 
         <div class="row rotary-row">
-          rotary: add this lol
+          <app-rotary></app-rotary>
         </div>
       </div>
 

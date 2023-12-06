@@ -5,11 +5,20 @@ import { UpdateFirebaseUID } from './game.actions';
 
 export const defaultGame: () => IGame = () => ({
   version: 0,
-  firebaseUID: ''
+  firebaseUID: '',
 });
 
-export function setFirebaseUID(ctx: StateContext<IGame>, { uid }: UpdateFirebaseUID) {
-  ctx.setState(patch<IGame>({
-    firebaseUID: uid
-  }));
+export function gameReset(ctx: StateContext<IGame>) {
+  ctx.setState(defaultGame());
+}
+
+export function setFirebaseUID(
+  ctx: StateContext<IGame>,
+  { uid }: UpdateFirebaseUID,
+) {
+  ctx.setState(
+    patch<IGame>({
+      firebaseUID: uid,
+    }),
+  );
 }

@@ -1,4 +1,5 @@
 import { IAttachment } from '../../interfaces/store';
+import { HardReset } from '../meta';
 import {
   UpdateBestScore,
   UpdateCurrentFruit,
@@ -8,6 +9,7 @@ import {
   UpdateScore,
 } from './suika.actions';
 import {
+  suikaReset,
   updateBestScore,
   updateCurrentFruit,
   updateGameLoseTimer,
@@ -17,6 +19,7 @@ import {
 } from './suika.functions';
 
 export const attachments: IAttachment[] = [
+  { action: HardReset, handler: suikaReset },
   { action: UpdateScore, handler: updateScore },
   { action: UpdateBestScore, handler: updateBestScore },
   { action: UpdateGameState, handler: updateGameState },

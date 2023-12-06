@@ -20,6 +20,10 @@ export const defaultSuika: () => ISuika = () => ({
   nextFruit: SuikaFruit.Cherry,
 });
 
+export function suikaReset(ctx: StateContext<ISuika>) {
+  ctx.setState(defaultSuika());
+}
+
 export function updateScore(
   ctx: StateContext<ISuika>,
   { newScore }: UpdateScore,

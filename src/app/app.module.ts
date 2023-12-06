@@ -23,6 +23,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import * as Stores from '../stores';
 import * as Migrations from '../stores/migrations';
 import { SuikaModule } from './pages/suika/suika.module';
+import { DebugService } from './services/debug.service';
 
 const allStores = Object.keys(Stores)
   .filter((x) => x.includes('State'))
@@ -59,14 +60,16 @@ const allStores = Object.keys(Stores)
     {
       provide: APP_INITIALIZER,
       multi: true,
-      deps: [CloudSaveService, MetaService, AnalyticsService],
+      deps: [DebugService, CloudSaveService, MetaService, AnalyticsService],
       useFactory:
         (
+          debugService: DebugService,
           cloudSaveService: CloudSaveService,
           metaService: MetaService,
           analyticsService: AnalyticsService,
         ) =>
         async () => {
+          await debugService.init();
           await cloudSaveService.init();
           await metaService.init();
           await analyticsService.init();
