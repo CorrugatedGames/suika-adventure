@@ -4,6 +4,7 @@ import { Select, Store } from '@ngxs/store';
 import {
   Bodies,
   Body,
+  Common,
   Composite,
   Engine,
   Events,
@@ -11,6 +12,7 @@ import {
   MouseConstraint,
   Render,
   Runner,
+  Vertices,
   World,
 } from 'matter-js';
 import { Observable, combineLatest } from 'rxjs';
@@ -29,6 +31,7 @@ import {
 } from '../../../../stores/suika/suika.actions';
 import { settings } from '../../../settings';
 
+import { uniqBy } from 'lodash';
 import seedrandom from 'seedrandom';
 import {
   getFruitData,
@@ -37,11 +40,23 @@ import {
 
 /*
 TODO:
-- adjust all hitboxes
 - random direction for merged fruit
 - refactor suika game to a bunch of anon functions, etc
 - create game by uuid, store uuid in suika state
+- losing is fucked again
+- moving mouse while placing should update lastmouseposition
 */
+
+import Decomp from 'poly-decomp';
+
+Common.setDecomp(Decomp);
+
+enum PhysicsCollision {
+  Wall = 0x0001,
+  Fruit = 0x0002,
+  Preview = 0x0004,
+  DottedLine = 0x0008,
+}
 
 @Component({
   selector: 'app-suika-game',
@@ -150,6 +165,10 @@ export class SuikaGameComponent implements OnInit {
           render: {
             ...settings.visual.wall,
           },
+          collisionFilter: {
+            category: PhysicsCollision.Wall,
+            mask: PhysicsCollision.Fruit,
+          },
         },
       ),
       Bodies.rectangle(
@@ -161,6 +180,10 @@ export class SuikaGameComponent implements OnInit {
           isStatic: true,
           render: {
             ...settings.visual.wall,
+          },
+          collisionFilter: {
+            category: PhysicsCollision.Wall,
+            mask: PhysicsCollision.Fruit,
           },
         },
       ),
@@ -176,6 +199,10 @@ export class SuikaGameComponent implements OnInit {
           render: {
             ...settings.visual.wall,
           },
+          collisionFilter: {
+            category: PhysicsCollision.Wall,
+            mask: PhysicsCollision.Fruit,
+          },
         },
       ),
       Bodies.rectangle(
@@ -187,6 +214,10 @@ export class SuikaGameComponent implements OnInit {
           isStatic: true,
           render: {
             ...settings.visual.wall,
+          },
+          collisionFilter: {
+            category: PhysicsCollision.Wall,
+            mask: PhysicsCollision.Fruit,
           },
         },
       ),
@@ -202,6 +233,10 @@ export class SuikaGameComponent implements OnInit {
           render: {
             ...settings.visual.wall,
           },
+          collisionFilter: {
+            category: PhysicsCollision.Wall,
+            mask: PhysicsCollision.Fruit,
+          },
         },
       ),
 
@@ -215,7 +250,7 @@ export class SuikaGameComponent implements OnInit {
           isSensor: false,
           isStatic: true,
           collisionFilter: {
-            mask: 0,
+            category: PhysicsCollision.DottedLine,
           },
         },
       ),
@@ -356,7 +391,10 @@ export class SuikaGameComponent implements OnInit {
       this.currentFruit,
       {
         isStatic: true,
-        collisionFilter: { mask: 0x0040 },
+        collisionFilter: {
+          category: PhysicsCollision.Preview,
+          mask: 0,
+        },
       },
     );
 
@@ -379,19 +417,30 @@ export class SuikaGameComponent implements OnInit {
     const fruitData = getFruitData(suikaFruit);
     const fruitPhysicsData = getFruitPhysics(suikaFruit);
 
+    const physicsProperties = {
+      restitution: fruitPhysicsData.restitution,
+      density: fruitPhysicsData.density,
+      friction: fruitPhysicsData.friction,
+      frictionAir: fruitPhysicsData.frictionAir,
+      frictionStatic: fruitPhysicsData.frictionStatic,
+    };
+
     if (!fruitData || !fruitPhysicsData) {
       throw new Error(`Cannot get data or physics for ${suikaFruit}`);
     }
 
-    const vertices = fruitPhysicsData.fixtures[0].vertices.flat();
+    const vertices = Vertices.clockwiseSort(
+      uniqBy(
+        fruitPhysicsData.fixtures[0].vertices.flat(),
+        (vert: { x: number; y: number }) => `${vert.x},${vert.y}`,
+      ),
+    );
 
     const body = Bodies.fromVertices(
       x,
       y,
       [vertices],
       {
-        ...settings.friction,
-        ...extraOpts,
         render: {
           sprite: {
             texture: `assets/fruit/images/${fruitData.fruitId}.png`,
@@ -399,15 +448,23 @@ export class SuikaGameComponent implements OnInit {
             yScale: 1,
           },
         },
-      },
+        collisionFilter: {
+          category: PhysicsCollision.Fruit,
+          mask: PhysicsCollision.Wall | PhysicsCollision.Fruit,
+        },
+        fruitId: suikaFruit,
+        ...physicsProperties,
+        ...extraOpts,
+      } as Partial<ISuikaFruitBody>,
       true,
+      0.1,
+      5,
+      0.1,
     );
 
     if (!body) {
       throw new Error(`Cannot generate body for suika fruit ${suikaFruit}`);
     }
-
-    (body as ISuikaFruitBody).fruitId = suikaFruit;
 
     return body;
   }
@@ -462,6 +519,7 @@ export class SuikaGameComponent implements OnInit {
 
     // merge fruits if possible
     if (
+      settings.game.enableMerge &&
       bodyA.fruitId === bodyB.fruitId &&
       !bodyA.hasMerged &&
       !bodyB.hasMerged
@@ -469,23 +527,23 @@ export class SuikaGameComponent implements OnInit {
       bodyA.hasMerged = true;
       bodyB.hasMerged = true;
 
+      const midPosX = (bodyA.position.x + bodyB.position.x) / 2;
+      const midPosY = (bodyA.position.y + bodyB.position.y) / 2;
+
       const newFruitId = bodyA.fruitId + 1;
 
       const existingFruitData = getFruitData(bodyA.fruitId);
       this.store.dispatch(new UpdateScore(existingFruitData.score));
 
+      Composite.remove(this.world, [bodyA, bodyB]);
+
       const fruitData = getFruitData(newFruitId);
       if (fruitData) {
-        const midPosX = (bodyA.position.x + bodyB.position.x) / 2;
-        const midPosY = (bodyA.position.y + bodyB.position.y) / 2;
-
         Composite.add(
           this.world,
           this.generateFruitBody(midPosX, midPosY, newFruitId),
         );
       }
-
-      Composite.remove(this.world, [bodyA, bodyB]);
     }
   }
 }
