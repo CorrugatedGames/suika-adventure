@@ -1,1 +1,5 @@
 @import 'theme/index.scss';
+
+* {
+  user-select: none;
+}

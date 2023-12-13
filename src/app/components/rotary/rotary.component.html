@@ -1,1 +1,7 @@
-<p>rotary works!</p>
+<div class="grid fruit-grid">
+  <div class="row fruit-row" *ngFor="let row of fruits">
+    <div class="col fruit-col" *ngFor="let fruit of row">
+      <app-fruit-icon [fruit]="fruit.fruit" [size]="fruit.size"></app-fruit-icon>
+    </div>
+  </div>
+</div>

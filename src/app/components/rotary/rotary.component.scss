@@ -1,0 +1,13 @@
+.fruit-grid {
+  margin-top: 40px;
+
+  .fruit-row {
+    padding-top: 8px;
+
+    .fruit-col {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
