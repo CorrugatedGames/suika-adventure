@@ -429,38 +429,53 @@ export class SuikaGameComponent implements OnInit {
       throw new Error(`Cannot get data or physics for ${suikaFruit}`);
     }
 
-    const vertices = Vertices.clockwiseSort(
-      uniqBy(
-        fruitPhysicsData.fixtures[0].vertices.flat(),
-        (vert: { x: number; y: number }) => `${vert.x},${vert.y}`,
-      ),
-    );
+    const otherBodyProps = {
+      collisionFilter: {
+        category: PhysicsCollision.Fruit,
+        mask: PhysicsCollision.Wall | PhysicsCollision.Fruit,
+      },
+      fruitId: suikaFruit,
+      ...physicsProperties,
+      ...extraOpts,
+    };
 
-    const body = Bodies.fromVertices(
-      x,
-      y,
-      [vertices],
-      {
-        render: {
-          sprite: {
-            texture: `assets/fruit/images/${fruitData.fruitId}.png`,
-            xScale: 1,
-            yScale: 1,
+    let body: Matter.Body;
+
+    if (settings.game.renderCustomShapes) {
+      const vertices = Vertices.clockwiseSort(
+        uniqBy(
+          fruitPhysicsData.fixtures[0].vertices.flat(),
+          (vert: { x: number; y: number }) => `${vert.x},${vert.y}`,
+        ),
+      );
+
+      body = Bodies.fromVertices(
+        x,
+        y,
+        [vertices],
+        {
+          render: {
+            sprite: {
+              texture: `assets/fruit/images/${fruitData.fruitId}.png`,
+              xScale: 1,
+              yScale: 1,
+            },
           },
+          ...otherBodyProps,
+        } as Partial<ISuikaFruitBody>,
+        true,
+        0.1,
+        5,
+        0.1,
+      );
+    } else {
+      body = Bodies.circle(x, y, fruitData.size, {
+        render: {
+          fillStyle: fruitData.color,
         },
-        collisionFilter: {
-          category: PhysicsCollision.Fruit,
-          mask: PhysicsCollision.Wall | PhysicsCollision.Fruit,
-        },
-        fruitId: suikaFruit,
-        ...physicsProperties,
-        ...extraOpts,
-      } as Partial<ISuikaFruitBody>,
-      true,
-      0.1,
-      5,
-      0.1,
-    );
+        ...otherBodyProps,
+      });
+    }
 
     if (!body) {
       throw new Error(`Cannot generate body for suika fruit ${suikaFruit}`);

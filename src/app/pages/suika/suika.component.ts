@@ -49,7 +49,11 @@ export class SuikaComponent implements OnInit {
     this.isGameOverOpen = true;
 
     try {
-      await this.modalService.open(this.gameOverModalRef).result;
+      await this.modalService.open(this.gameOverModalRef, {
+        backdrop: 'static',
+        keyboard: false,
+        centered: true,
+      }).result;
     } catch {
       // Do nothing
     }

@@ -47,7 +47,6 @@
 <ng-template #gameOverModal let-modal>
   <div class="modal-header">
     <h4 class="modal-title">Game Over!</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
 
   <div class="modal-body">
@@ -55,6 +54,6 @@
   </div>
 
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Restart Game</button>
+    <button type="button" class="btn btn-outline-light" (click)="modal.close()">Restart Game</button>
   </div>
 </ng-template>

@@ -1,9 +1,14 @@
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 
-body {
+body,
+.modal-content {
   background: url(../../assets/core/splash-dark.png) no-repeat center
     center/cover;
 
   color: #fff;
+}
+
+.modal-content {
+  border: 1px solid #fff;
 }
