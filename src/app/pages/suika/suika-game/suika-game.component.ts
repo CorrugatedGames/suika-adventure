@@ -40,7 +40,6 @@ import {
 
 /*
 TODO:
-- refactor suika game to a bunch of anon functions, etc
 - create game by uuid, store uuid in suika state
 - losing is fucked again
 - moving mouse while placing should update lastmouseposition
