@@ -471,6 +471,11 @@ export class SuikaGameComponent implements OnInit {
     } else {
       body = Bodies.circle(x, y, fruitData.size, {
         render: {
+          sprite: {
+            texture: `assets/fruit/images-circular/${fruitData.fruitId}.png`,
+            xScale: 1,
+            yScale: 1,
+          },
           fillStyle: fruitData.color,
         },
         ...otherBodyProps,

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { SuikaFruit } from '../../../interfaces';
 import { getFruitData } from '../../helpers/suika/fruit-data';
+import { settings } from '../../settings';
 
 @Component({
   selector: 'app-fruit-icon',
@@ -16,7 +17,11 @@ export class FruitIconComponent {
     return fruitData.fruitId;
   }
 
+  public get shapeFolder() {
+    return settings.game.renderCustomShapes ? 'images' : 'images-circular';
+  }
+
   public get sprite(): string {
-    return `assets/fruit/images/${this.fruitName}.png`;
+    return `assets/fruit/${this.shapeFolder}/${this.fruitName}.png`;
   }
 }
