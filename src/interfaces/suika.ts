@@ -1,3 +1,6 @@
+import type { Store } from '@ngxs/store';
+import type { Engine, Render, Runner, World } from 'matter-js';
+
 export interface ISuika {
   gameState: SuikaGameState;
 
@@ -34,4 +37,21 @@ export enum SuikaGameState {
 export interface ISuikaFruitBody extends Matter.Body {
   fruitId: SuikaFruit;
   hasMerged: boolean;
+}
+
+export enum PhysicsCollision {
+  Wall = 0x0001,
+  Fruit = 0x0002,
+  Preview = 0x0004,
+  DottedLine = 0x0008,
+}
+
+export interface IGameMatterState {
+  store: Store;
+  state: SuikaGameState;
+  engine: Engine;
+  world: World;
+  render: Render;
+  runner: Runner;
+  prng: () => number;
 }

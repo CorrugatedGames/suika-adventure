@@ -16,6 +16,16 @@ export class AppComponent implements OnInit {
   constructor(private store: Store) {}
 
   ngOnInit() {
+    document.body.addEventListener(
+      'contextmenu',
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      },
+      false,
+    );
+
     this.state$.pipe(first()).subscribe((state) => {
       if (state !== SuikaGameState.GameOver) return;
 
