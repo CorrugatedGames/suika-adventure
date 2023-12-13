@@ -40,7 +40,6 @@ import {
 
 /*
 TODO:
-- random direction for merged fruit
 - refactor suika game to a bunch of anon functions, etc
 - create game by uuid, store uuid in suika state
 - losing is fucked again
@@ -559,10 +558,14 @@ export class SuikaGameComponent implements OnInit {
 
       const fruitData = getFruitData(newFruitId);
       if (fruitData) {
-        Composite.add(
-          this.world,
-          this.generateFruitBody(midPosX, midPosY, newFruitId),
+        const newFruitBody = this.generateFruitBody(
+          midPosX,
+          midPosY,
+          newFruitId,
         );
+        Body.setAngle(newFruitBody, this.prng() * 360);
+
+        Composite.add(this.world, newFruitBody);
       }
     }
   }
