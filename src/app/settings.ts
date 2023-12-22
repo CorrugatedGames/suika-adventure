@@ -16,8 +16,8 @@ export const settings = {
     dropOffset: 48,
     topBuffer: 160,
     wallWidth: 32,
-    width: 800,
-    height: 928,
+    width: 650,
+    height: 832,
   },
   game: {
     enableMerge: true,

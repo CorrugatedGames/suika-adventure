@@ -1,33 +1,21 @@
 <div class="container">
 
   <div class="row header-row">
-    <div class="col-12 header-container">
-      <h1>Suika Adventure</h1>
-    </div>
-
-    <div class="col-12 description-container">
-      <p>The adventure is coming...</p>
-    </div>
-
     <div class="row game-row">
+
       <div class="col-3">
+        <div class="row header-container">
+          <div class="col-12">
+            <h1>Suika Adventure</h1>
+          </div>
+        </div>
+
         <div class="row timer-row">
           @if(gameLoseTimer$ | async) {
           <span>
             Failure in {{ gameLoseTimer$ | async | number }} seconds...
           </span>
           }
-        </div>
-
-        <div class="row score-row">
-          <div class="col-12 score-container">
-            <p>Score: {{ score$ | async | number }}</p>
-            <p>Best Score: {{ bestScore$ | async | number }}</p>
-          </div>
-        </div>
-
-        <div class="row next-fruit-row">
-          <app-next-fruit></app-next-fruit>
         </div>
 
         <div class="row rotary-row">
@@ -37,6 +25,24 @@
 
       <div class="col-9 game-container">
         <app-suika-game></app-suika-game>
+      </div>
+    </div>
+
+
+    <div class="row score-row mt-2">
+      <div class="col-3 next-fruit-row">
+        <app-next-fruit></app-next-fruit>
+      </div>
+
+      <div class="col-3 score-container">
+        <p>Score: {{ score$ | async | number }}</p>
+      </div>
+
+      <div class="col-3 score-container">
+        <p>Best Score: {{ bestScore$ | async | number }}</p>
+      </div>
+
+      <div class="col-3">
       </div>
     </div>
 
