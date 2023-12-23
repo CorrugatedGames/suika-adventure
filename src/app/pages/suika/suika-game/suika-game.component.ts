@@ -40,9 +40,9 @@ import {
 
 /*
 TODO:
-- create game by uuid, store uuid in suika state
 - losing is fucked again
 - moving mouse while placing should update lastmouseposition
+- create game by uuid, store uuid in suika state
 */
 
 import Decomp from 'poly-decomp';

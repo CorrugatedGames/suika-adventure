@@ -13,11 +13,11 @@ export const settings = {
     },
   },
   size: {
-    dropOffset: 48,
+    dropOffset: 96,
     topBuffer: 160,
     wallWidth: 32,
     width: 650,
-    height: 832,
+    height: 800,
   },
   game: {
     enableMerge: true,
