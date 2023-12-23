@@ -208,7 +208,7 @@ export class SuikaGameComponent implements OnInit {
 
     setTimeout(() => {
       this.cycleFruits();
-    }, 200);
+    }, settings.game.dropDelay);
   }
 
   // create a new preview fruit

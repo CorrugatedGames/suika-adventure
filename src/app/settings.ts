@@ -22,6 +22,7 @@ export const settings = {
   game: {
     enableMerge: true,
     renderCustomShapes: false,
+    dropDelay: 500,
   },
   fruits: {
     [SuikaFruit.Cherry]: {
