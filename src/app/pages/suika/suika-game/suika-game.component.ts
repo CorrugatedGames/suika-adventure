@@ -45,7 +45,7 @@ import {
 
 /*
 TODO:
-- change physics for each fruit
+- apply forces to merged fruits
 - uncouple everything from ui I hate it
 */
 

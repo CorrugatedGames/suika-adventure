@@ -15,7 +15,7 @@ export const settings = {
   size: {
     dropOffset: 96,
     topBuffer: 160,
-    wallWidth: 12,
+    wallWidth: 16,
     width: 650,
     height: 800,
   },
@@ -33,11 +33,11 @@ export const settings = {
       score: 1,
       chances: 10,
       physics: {
-        density: 0.1,
-        restitution: 0.006,
-        friction: 0.006,
-        frictionAir: 0.006,
-        frictionStatic: 0.006,
+        density: 0.05,
+        restitution: 0.4,
+        friction: 0.003,
+        frictionAir: 0.012,
+        frictionStatic: 0,
       },
     },
     [SuikaFruit.Strawberry]: {
@@ -47,11 +47,11 @@ export const settings = {
       score: 3,
       chances: 8,
       physics: {
-        density: 0.1,
-        restitution: 0.006,
-        friction: 0.006,
+        density: 0.05,
+        restitution: 0.3,
+        friction: 0.003,
         frictionAir: 0.006,
-        frictionStatic: 0.006,
+        frictionStatic: 0,
       },
     },
     [SuikaFruit.Grape]: {
@@ -62,10 +62,10 @@ export const settings = {
       chances: 31,
       physics: {
         density: 0.1,
-        restitution: 0.006,
-        friction: 0.006,
+        restitution: 0.3,
+        friction: 0.003,
         frictionAir: 0.006,
-        frictionStatic: 0.006,
+        frictionStatic: 0,
       },
     },
     [SuikaFruit.Clementine]: {
@@ -73,11 +73,11 @@ export const settings = {
       color: '#ffaa41',
       size: 60,
       score: 4,
-      chances: 1,
+      chances: 2,
       physics: {
         density: 0.1,
         restitution: 0.006,
-        friction: 0.006,
+        friction: 0.003,
         frictionAir: 0.006,
         frictionStatic: 0.006,
       },
@@ -131,8 +131,8 @@ export const settings = {
       score: 47,
       chances: 0,
       physics: {
-        density: 0.1,
-        restitution: 0.006,
+        density: 0.25,
+        restitution: 0.6,
         friction: 0.006,
         frictionAir: 0.006,
         frictionStatic: 0.006,
@@ -145,7 +145,7 @@ export const settings = {
       score: 76,
       chances: 0,
       physics: {
-        density: 0.1,
+        density: 0.3,
         restitution: 0.006,
         friction: 0.006,
         frictionAir: 0.006,
@@ -159,7 +159,7 @@ export const settings = {
       score: 123,
       chances: 0,
       physics: {
-        density: 0.1,
+        density: 0.35,
         restitution: 0.006,
         friction: 0.006,
         frictionAir: 0.006,
@@ -173,7 +173,7 @@ export const settings = {
       score: 199,
       chances: 0,
       physics: {
-        density: 0.1,
+        density: 0.4,
         restitution: 0.006,
         friction: 0.006,
         frictionAir: 0.006,
