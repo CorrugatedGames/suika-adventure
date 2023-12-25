@@ -45,9 +45,8 @@ import {
 
 /*
 TODO:
-- moving mouse while placing should update lastmouseposition
-- uncouple everything from ui I hate it
 - change physics for each fruit
+- uncouple everything from ui I hate it
 */
 
 import Decomp from 'poly-decomp';
@@ -165,6 +164,7 @@ export class SuikaGameComponent implements OnInit {
     });
 
     Events.on(mouseConstraint, 'mousemove', (e) => {
+      this.lastMousePosition = e.mouse.position.x;
       if (this.currentState !== SuikaGameState.Ready || !this.previewBody)
         return;
 
