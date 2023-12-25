@@ -15,7 +15,7 @@ export const settings = {
   size: {
     dropOffset: 96,
     topBuffer: 160,
-    wallWidth: 8,
+    wallWidth: 12,
     width: 650,
     height: 800,
   },

@@ -45,7 +45,6 @@ import {
 
 /*
 TODO:
-- grapes speed off to infinity. set max speed or something?
 - moving mouse while placing should update lastmouseposition
 - uncouple everything from ui I hate it
 - change physics for each fruit
