@@ -8,7 +8,7 @@ export function attemptFruitMerge(
   state: IGameMatterState,
   bodyA: ISuikaFruitBody,
   bodyB: ISuikaFruitBody,
-): boolean {
+): Body | undefined {
   if (
     settings.game.enableMerge &&
     bodyA.fruitId === bodyB.fruitId &&
@@ -31,10 +31,10 @@ export function attemptFruitMerge(
       Body.setAngle(newFruitBody, state.prng() * 360);
 
       Composite.add(state.world, newFruitBody);
-    }
 
-    return true;
+      return newFruitBody;
+    }
   }
 
-  return false;
+  return undefined;
 }

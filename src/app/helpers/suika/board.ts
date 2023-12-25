@@ -1,5 +1,6 @@
 import {
   Bodies,
+  Body,
   Composite,
   Engine,
   Mouse,
@@ -9,11 +10,12 @@ import {
 } from 'matter-js';
 import {
   IGameMatterState,
+  ISuikaFruitBody,
   PhysicsCollision,
   SuikaFruit,
+  SuikaObstacle,
 } from '../../../interfaces';
 import { settings } from '../../settings';
-import { generateFruitBody } from './fruit-creation';
 
 export function createMatterWorld(canvas: HTMLCanvasElement) {
   const engine = Engine.create();
@@ -36,7 +38,8 @@ export function createMatterWorld(canvas: HTMLCanvasElement) {
   Runner.run(runner, engine);
 
   // walls
-  Composite.add(world, getBoardBoundaries());
+  const allBoundaries = getBoardBoundaries();
+  Composite.add(world, allBoundaries);
 
   // add mouse control
   const mouse = Mouse.create(render.canvas);
@@ -65,6 +68,7 @@ export function createMatterWorld(canvas: HTMLCanvasElement) {
     render,
     runner,
     mouseConstraint,
+    loseBodies: allBoundaries.slice(-1),
   };
 }
 
@@ -88,6 +92,7 @@ export function getBoardBoundaries() {
       settings.size.wallWidth,
       settings.size.height,
       {
+        label: 'Border Wall',
         isStatic: true,
         render: {
           ...settings.visual.wall,
@@ -104,6 +109,7 @@ export function getBoardBoundaries() {
       settings.size.wallWidth,
       settings.size.height,
       {
+        label: 'Border Wall',
         isStatic: true,
         render: {
           ...settings.visual.wall,
@@ -122,6 +128,7 @@ export function getBoardBoundaries() {
       settings.size.wallWidth,
       settings.size.height,
       {
+        label: 'Border Wall',
         isStatic: true,
         render: {
           ...settings.visual.wall,
@@ -138,6 +145,7 @@ export function getBoardBoundaries() {
       settings.size.wallWidth,
       settings.size.height,
       {
+        label: 'Border Wall',
         isStatic: true,
         render: {
           ...settings.visual.wall,
@@ -156,6 +164,7 @@ export function getBoardBoundaries() {
       settings.size.width,
       settings.size.wallWidth,
       {
+        label: 'Border Wall',
         isStatic: true,
         render: {
           ...settings.visual.wall,
@@ -174,12 +183,15 @@ export function getBoardBoundaries() {
       settings.size.width,
       1,
       {
-        isSensor: false,
+        label: 'Lose Bar',
+        isSensor: true,
         isStatic: true,
+        fruitId: SuikaObstacle.DeathTouch,
         collisionFilter: {
           category: PhysicsCollision.DottedLine,
+          mask: PhysicsCollision.Fruit,
         },
-      },
+      } as ISuikaFruitBody,
     ),
   ];
 }
@@ -187,13 +199,7 @@ export function getBoardBoundaries() {
 export function addFruitToWorld(
   state: IGameMatterState,
   dropX: number,
-  currentFruit: SuikaFruit,
+  droppedFruit: Body,
 ) {
-  const droppedFruit = generateFruitBody(
-    dropX,
-    settings.size.dropOffset,
-    currentFruit,
-  );
-
   Composite.add(state.world, droppedFruit);
 }

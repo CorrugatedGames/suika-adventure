@@ -15,7 +15,7 @@ export const settings = {
   size: {
     dropOffset: 96,
     topBuffer: 160,
-    wallWidth: 32,
+    wallWidth: 8,
     width: 650,
     height: 800,
   },
@@ -23,6 +23,7 @@ export const settings = {
     enableMerge: true,
     renderCustomShapes: false,
     dropDelay: 500,
+    lossSeconds: 5,
   },
   fruits: {
     [SuikaFruit.Cherry]: {

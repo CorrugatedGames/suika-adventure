@@ -16,11 +16,14 @@
 }
 
 .game-row {
-  .timer-row .timer {
+  .timer-row {
     padding-top: 16px;
-    min-height: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+    .timer {
+      min-height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }

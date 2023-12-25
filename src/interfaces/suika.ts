@@ -13,6 +13,10 @@ export interface ISuika {
   nextFruit: SuikaFruit;
 }
 
+export enum SuikaObstacle {
+  DeathTouch = -1,
+}
+
 export enum SuikaFruit {
   Cherry = 1,
   Strawberry = 2,
@@ -35,7 +39,7 @@ export enum SuikaGameState {
 }
 
 export interface ISuikaFruitBody extends Matter.Body {
-  fruitId: SuikaFruit;
+  fruitId: SuikaFruit | SuikaObstacle;
   hasMerged: boolean;
 }
 

@@ -7,6 +7,7 @@ import {
   Composite,
   Engine,
   Events,
+  Query,
   Render,
   Runner,
   World,
@@ -21,6 +22,7 @@ import {
 import { SuikaState } from '../../../../stores';
 import {
   UpdateCurrentFruit,
+  UpdateGameLoseTimer,
   UpdateGameState,
   UpdateNextFruit,
   UpdateScore,
@@ -33,6 +35,7 @@ import {
   attemptFruitMerge,
   boundsForFruit,
   createMatterWorld,
+  generateFruitBody,
   generatePreviewFruitBody,
   getFruitData,
   getRandomDroppableFruit,
@@ -40,13 +43,12 @@ import {
 
 /*
 TODO:
-- losing is fucked again
 - moving mouse while placing should update lastmouseposition
 - create game by uuid, store uuid in suika state
+- uncouple everything from ui I hate it
 */
 
 import Decomp from 'poly-decomp';
-import { loseCheck } from '../../../helpers/suika/lose-check';
 
 Common.setDecomp(Decomp);
 
@@ -64,7 +66,6 @@ export class SuikaGameComponent implements OnInit {
   @Select(SuikaState.nextFruit) nextFruit$!: Observable<SuikaFruit>;
 
   private isInit = false;
-  private allTimeouts: Array<ReturnType<typeof setTimeout>> = [];
 
   private lastMousePosition = 0;
 
@@ -78,6 +79,14 @@ export class SuikaGameComponent implements OnInit {
   private currentFruit: SuikaFruit = SuikaFruit.Cherry;
   private nextFruit: SuikaFruit = SuikaFruit.Cherry;
   private previewBody: Matter.Body | null = null;
+
+  private loseBodies: Body[] = [];
+  private fruitBodies: Body[] = [];
+
+  private startEndTimestamp = 0;
+  private lastLoseTick = 0;
+
+  private loseFn!: () => void;
 
   private prng = seedrandom('seed');
 
@@ -109,6 +118,10 @@ export class SuikaGameComponent implements OnInit {
     this.isInit = false;
     this.previewBody = null;
 
+    this.loseBodies = [];
+    this.fruitBodies = [];
+
+    Events.off(this.runner, 'afterTick', this.loseFn);
     World.clear(this.world, false);
     Engine.clear(this.engine);
     Render.stop(this.render);
@@ -119,13 +132,18 @@ export class SuikaGameComponent implements OnInit {
     this.canvasRef.nativeElement.width = settings.size.width;
     this.canvasRef.nativeElement.height = settings.size.height;
 
-    const { engine, world, render, runner, mouseConstraint } =
+    const { engine, world, render, runner, mouseConstraint, loseBodies } =
       createMatterWorld(this.canvasRef.nativeElement);
 
     this.engine = engine;
     this.world = world;
     this.render = render;
     this.runner = runner;
+    this.loseBodies = loseBodies;
+
+    // lose checking
+    this.loseFn = () => this.afterTick();
+    Events.on(this.runner, 'afterTick', this.loseFn);
 
     // collision events
     Events.on(this.engine, 'collisionStart', (e) => {
@@ -148,6 +166,40 @@ export class SuikaGameComponent implements OnInit {
 
     // generate the first two fruits
     this.cycleFruits();
+  }
+
+  private afterTick() {
+    const collisions = Query.collides(this.loseBodies[0], this.fruitBodies);
+    if (collisions.length === 0) {
+      this.startEndTimestamp = 0;
+      this.lastLoseTick = 0;
+      this.store.dispatch(new UpdateGameLoseTimer(0));
+      return;
+    }
+
+    if (!this.startEndTimestamp) this.startEndTimestamp = Date.now();
+
+    const secondsElapsed =
+      Math.floor((Date.now() - this.startEndTimestamp) / 1000) - 1;
+
+    // grace period
+    if (secondsElapsed > 0 && secondsElapsed > this.lastLoseTick) {
+      console.log({ secondsElapsed, lastLoseTick: this.lastLoseTick });
+      this.store.dispatch(
+        new UpdateGameLoseTimer(settings.game.lossSeconds - this.lastLoseTick),
+      );
+
+      this.lastLoseTick++;
+
+      if (this.lastLoseTick >= settings.game.lossSeconds) {
+        this.startEndTimestamp = 0;
+        this.lastLoseTick = 0;
+        this.store.dispatch([
+          new UpdateGameLoseTimer(0),
+          new UpdateGameState(SuikaGameState.GameOver),
+        ]);
+      }
+    }
   }
 
   private getGameMatterState(): IGameMatterState {
@@ -202,7 +254,14 @@ export class SuikaGameComponent implements OnInit {
 
     Composite.remove(this.world, this.previewBody);
 
-    addFruitToWorld(this.getGameMatterState(), dropX, this.currentFruit);
+    const droppedFruit = generateFruitBody(
+      dropX,
+      settings.size.dropOffset,
+      this.currentFruit,
+    );
+
+    addFruitToWorld(this.getGameMatterState(), dropX, droppedFruit);
+    this.fruitBodies.push(droppedFruit);
 
     this.previewBody = null;
 
@@ -227,16 +286,20 @@ export class SuikaGameComponent implements OnInit {
 
   // two bodies collide, but it's just two fruits usually
   private bodyCollision(bodyA: ISuikaFruitBody, bodyB: ISuikaFruitBody) {
-    if (bodyA.isStatic || bodyB.isStatic || !bodyA.fruitId || !bodyB.fruitId)
-      return;
-
-    // check if we lose
-    loseCheck(this.getGameMatterState(), this.allTimeouts, bodyA, bodyB);
+    if (!bodyA.fruitId || !bodyB.fruitId) return;
 
     // merge fruits if possible
-    const didMerge = attemptFruitMerge(this.getGameMatterState(), bodyA, bodyB);
-    if (didMerge) {
-      const existingFruitData = getFruitData(bodyA.fruitId);
+    const mergedBody = attemptFruitMerge(
+      this.getGameMatterState(),
+      bodyA,
+      bodyB,
+    );
+    if (mergedBody) {
+      this.fruitBodies = this.fruitBodies.filter(
+        (body) => body !== bodyA && body !== bodyB,
+      );
+      this.fruitBodies.push(mergedBody);
+      const existingFruitData = getFruitData(bodyA.fruitId as SuikaFruit);
       this.store.dispatch(new UpdateScore(existingFruitData.score));
     }
   }

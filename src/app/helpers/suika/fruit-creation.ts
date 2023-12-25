@@ -49,7 +49,10 @@ export function generateFruitBody(
   const otherBodyProps = {
     collisionFilter: {
       category: PhysicsCollision.Fruit,
-      mask: PhysicsCollision.Wall | PhysicsCollision.Fruit,
+      mask:
+        PhysicsCollision.Wall |
+        PhysicsCollision.Fruit |
+        PhysicsCollision.DottedLine,
     },
     fruitId: suikaFruit,
     ...physicsProperties,
