@@ -45,7 +45,6 @@ import {
 
 /*
 TODO:
-- apply forces to merged fruits
 - uncouple everything from ui I hate it
 */
 

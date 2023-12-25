@@ -29,6 +29,8 @@ export function attemptFruitMerge(
     if (fruitData) {
       const newFruitBody = generateFruitBody(midPosX, midPosY, newFruitId);
       Body.setAngle(newFruitBody, state.prng() * 360);
+      Body.applyForce(newFruitBody, bodyA.position, bodyA.force);
+      Body.applyForce(newFruitBody, bodyB.position, bodyB.force);
 
       Composite.add(state.world, newFruitBody);
 
