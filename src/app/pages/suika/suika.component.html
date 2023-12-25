@@ -11,11 +11,13 @@
         </div>
 
         <div class="row timer-row">
-          @if(gameLoseTimer$ | async) {
-          <span>
-            Failure in {{ gameLoseTimer$ | async | number }} seconds...
-          </span>
-          }
+          <div class="col-12 timer">
+            @if(gameLoseTimer$ | async) {
+            <span>
+              Failure in {{ gameLoseTimer$ | async | number }} seconds...
+            </span>
+            }
+          </div>
         </div>
 
         <div class="row rotary-row">
