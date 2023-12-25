@@ -2,6 +2,8 @@ import type { Store } from '@ngxs/store';
 import type { Engine, Render, Runner, World } from 'matter-js';
 
 export interface ISuika {
+  uuid: string;
+
   gameState: SuikaGameState;
 
   gameLoseTimer: number;

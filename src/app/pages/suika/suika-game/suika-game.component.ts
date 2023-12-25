@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { v4 as uuid } from 'uuid';
 
 import { Select, Store } from '@ngxs/store';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../../../../interfaces';
 import { SuikaState } from '../../../../stores';
 import {
+  SetGameId,
   UpdateCurrentFruit,
   UpdateGameLoseTimer,
   UpdateGameState,
@@ -43,8 +45,8 @@ import {
 
 /*
 TODO:
+- grapes speed off to infinity. set max speed or something?
 - moving mouse while placing should update lastmouseposition
-- create game by uuid, store uuid in suika state
 - uncouple everything from ui I hate it
 - change physics for each fruit
 */
@@ -89,7 +91,7 @@ export class SuikaGameComponent implements OnInit {
 
   private loseFn!: () => void;
 
-  private prng = seedrandom('seed');
+  private prng = seedrandom('default seed');
 
   constructor(private store: Store) {}
 
@@ -132,6 +134,11 @@ export class SuikaGameComponent implements OnInit {
   private initGame() {
     this.canvasRef.nativeElement.width = settings.size.width;
     this.canvasRef.nativeElement.height = settings.size.height;
+
+    const gameId = uuid();
+    this.store.dispatch(new SetGameId(gameId));
+
+    this.prng = seedrandom(gameId);
 
     const { engine, world, render, runner, mouseConstraint, loseBodies } =
       createMatterWorld(this.canvasRef.nativeElement);

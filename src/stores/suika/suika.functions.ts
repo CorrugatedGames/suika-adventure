@@ -2,6 +2,7 @@ import { StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 import { ISuika, SuikaFruit, SuikaGameState } from '../../interfaces/suika';
 import {
+  SetGameId,
   UpdateBestScore,
   UpdateCurrentFruit,
   UpdateGameLoseTimer,
@@ -12,6 +13,7 @@ import {
 
 export const defaultSuika: () => ISuika = () => ({
   version: 0,
+  uuid: '',
   score: 0,
   bestScore: 0,
   gameLoseTimer: 0,
@@ -22,6 +24,14 @@ export const defaultSuika: () => ISuika = () => ({
 
 export function suikaReset(ctx: StateContext<ISuika>) {
   ctx.setState(defaultSuika());
+}
+
+export function setGameId(ctx: StateContext<ISuika>, { newId }: SetGameId) {
+  ctx.setState(
+    patch<ISuika>({
+      uuid: newId,
+    }),
+  );
 }
 
 export function updateScore(

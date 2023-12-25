@@ -1,5 +1,10 @@
 import { SuikaFruit, SuikaGameState } from '../../interfaces';
 
+export class SetGameId {
+  static type = '[GameState] Set Id';
+  constructor(public newId: string) {}
+}
+
 export class UpdateScore {
   static type = '[Score] Update Current';
   constructor(public newScore: number) {}
